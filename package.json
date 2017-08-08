@@ -1,0 +1,25 @@
+{
+  "name": "mysql-storefront",
+  "version": "1.0.0",
+  "description": "CLI storefront to learn MySQL",
+  "main": "customer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MitHipster/unc_assign_12_mysql_storefront.git"
+  },
+  "author": "Tim Acker",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MitHipster/unc_assign_12_mysql_storefront/issues"
+  },
+  "homepage": "https://github.com/MitHipster/unc_assign_12_mysql_storefront#readme",
+  "dependencies": {
+    "chalk": "^2.1.0",
+    "inquirer": "^3.2.1",
+    "mysql": "^2.14.1",
+    "table": "^4.0.1"
+  }
+}
