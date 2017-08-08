@@ -1,4 +1,4 @@
-product_name,dept_id,price,cost,quantity
+prod_name,dept_id,price,cost,quantity
 iPad Pro,1,599.99,320,3
 iPhone 7 Plus,1,899.99,450.25,10
 Samsung Microwave,2,199.99,120.75,4
