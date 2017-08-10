@@ -8,10 +8,17 @@ const messages = {
   buyWhat: 'What item would you like to purchase? Enter product ID.',
   howMany: 'How many would you like to buy?'
 };
-// Query to show all products
-const queryShow = "SELECT prod_id AS Id, prod_name AS Product, concat('$', format(price, 2)) AS Price FROM products";
-// Query to return inventory of item to be purchased
-const queryCheck = "SELECT quantity FROM products WHERE ?";
+
+const query = {
+  // Query to show all products
+  show: "SELECT prod_id AS Id, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price FROM products",
+  // Query to return inventory on item to be purchased
+  check: "SELECT quantity FROM products WHERE prod_id = ?",
+  // Query to update products table for sale
+  update: "UPDATE products SET sales = sales + (price * ?), cogs = cogs + (cost * ?), quantity = quantity - ? WHERE prod_id = ?",
+  // Query to get the total purchase price
+  total: "SELECT CONCAT('$', FORMAT(price * ?, 2)) AS total FROM products WHERE prod_id = ?"
+};
 // Column headings for products table
 let products = [
   ['ID', 'Product', 'Price']
@@ -41,7 +48,7 @@ connection.connect(function (err) {
 });
 
 let showProducts = function () {
-  connection.query(queryShow, function (err, results) {
+  connection.query(query.show, function (err, results) {
     if (err) throw err;
     // Loop through elements in the array
     results.forEach(function (result, i) {
@@ -86,27 +93,44 @@ let prompts = function () {
         if (Number.isInteger(value) && parseInt(value) > 0) {
           return true;
         } else {
-          return 'Please enter a positive whole number.';
+          return 'Please enter a positive, whole number.';
         }
       }
     }
-]).then(function (answers) {
+  ]).then(function (answers) {
+    // Convert validated inouts to integers
+    answers.purchase = parseInt(answers.purchase);
+    answers.quantity = parseInt(answers.quantity);
     checkQuantity(answers);
   });
 };
 
-let checkQuantity = function(answers) {
-  connection.query(queryCheck, {prod_Id: answers.purchase}, function (err, results) {
+let checkQuantity = function(a) {
+  connection.query(query.check, [a.purchase], function (err, results) {
     if (err) throw err;
-    if (parseInt(answers.quantity) > results[0].quantity) {
+    if (a.quantity > results[0].quantity) {
       console.log(chalk.bold.red('\nInsufficient quantity available.\n'));
       connection.end();
     } else {
-      updateSales();
+      updateSales(a);
     }
   });
 };
 
-let updateSales = function() {
+let updateSales = function(a) {
+  let amt = a.quantity;
+  let values = [amt, amt, amt, a.purchase];
+  connection.query(query.update, values, function (err, results) {
+    if (err) throw err;
+    totalPurchase(a);
+  });
+};
 
+let totalPurchase = function (a) {
+  let values = [a.quantity, a.purchase];
+  connection.query(query.total, values, function (err, results) {
+    if (err) throw err;
+    console.log(chalk.bold.cyan('\nYour total is ' + results[0].total + '. Thank you for your purchase.\n'));
+    connection.end();
+  });
 };
