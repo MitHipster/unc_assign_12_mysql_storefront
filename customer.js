@@ -6,7 +6,7 @@ const chalk = require('chalk');
 const border = require('./border.js');
 const messages = {
   buyWhat: 'What item would you like to purchase? Enter product ID.',
-  howMany: 'How many would you like to buy?'
+  howMany: 'How many would you like to buy? (enter 0 to cancel)'
 };
 
 const query = {
@@ -82,7 +82,7 @@ let prompts = function () {
       message: messages.howMany,
       validate: function (value) {
         value = parseInt(value);
-        if (Number.isInteger(value) && parseInt(value) > 0) {
+        if (Number.isInteger(value) && parseInt(value) >= 0) {
           return true;
         } else {
           return 'Please enter a positive, whole number.';
@@ -102,6 +102,9 @@ let checkQuantity = function(a) {
     if (err) throw err;
     if (a.quantity > results[0].quantity) {
       console.log(chalk.bold.red('\nInsufficient quantity available.\n'));
+      connection.end();
+    } else if (a.quantity === 0) {
+      console.log(chalk.bold.red('\nTransaction has been cancelled.\n'));
       connection.end();
     } else {
       updateSales(a);

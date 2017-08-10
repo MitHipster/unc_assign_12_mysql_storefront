@@ -16,3 +16,5 @@ SELECT CONCAT('$', FORMAT(price * 2, 2)) AS total FROM products WHERE prod_id = 
 SELECT prod_id AS Id, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price, quantity AS Quantity FROM products;
 
 SELECT prod_id AS Id, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price, quantity AS Quantity FROM products WHERE quantity <= 5 ORDER BY quantity ASC, price ASC;
+
+UPDATE products SET quantity = quantity + 1 WHERE prod_id = 3;
