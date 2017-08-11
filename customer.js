@@ -11,7 +11,7 @@ const messages = {
 
 const query = {
   // Query to show all products
-  showProducts: "SELECT products.prod_id AS ID, products.prod_name AS Product, departments.dept_name AS Department,CONCAT('$', FORMAT(products.price, 2)) AS Price FROM products INNER JOIN departments ON products.dept_id = departments.dept_id ORDER BY departments.dept_id, products.prod_id",
+  showProducts: "SELECT products.prod_id AS ID, products.prod_name AS Product, departments.dept_name AS Department, CONCAT('$', FORMAT(products.price, 2)) AS Price FROM products INNER JOIN departments ON products.dept_id = departments.dept_id ORDER BY departments.dept_id, products.prod_id",
   // Query to return inventory on item to be purchased
   checkQuantity: "SELECT quantity FROM products WHERE prod_id = ?",
   // Query to update products table for sale

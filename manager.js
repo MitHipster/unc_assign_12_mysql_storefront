@@ -16,9 +16,9 @@ const messages = {
 
 const query = {
   // Query to show all products
-  viewProducts: "SELECT prod_id AS ID, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price, quantity AS Quantity FROM products",
+  viewProducts: "SELECT products.prod_id AS ID, products.prod_name AS Product, departments.dept_name AS Department, CONCAT('$', FORMAT(products.price, 2)) AS Price, products.quantity AS Quantity FROM products INNER JOIN departments ON products.dept_id = departments.dept_id ORDER BY departments.dept_id, products.prod_id",
   // Query to show low inventory items
-  lowInventory: "SELECT prod_id AS ID, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price, quantity AS Quantity FROM products WHERE quantity <= 5 ORDER BY quantity ASC, price ASC",
+  lowInventory: "SELECT products.prod_id AS ID, products.prod_name AS Product, departments.dept_name AS Department, CONCAT('$', FORMAT(products.price, 2)) AS Price, products.quantity AS Quantity FROM products INNER JOIN departments ON products.dept_id = departments.dept_id WHERE quantity <= 5 ORDER BY quantity ASC, price ASC;",
   // Query to add inventory to a selected item
   addInventory: "UPDATE products SET quantity = quantity + ? WHERE prod_id = ?",
   viewDepartments: "SELECT dept_id AS ID, dept_name AS Department FROM departments",
@@ -55,7 +55,7 @@ let prompts = function () {
   }).then(function (answer) {
     let option = parseInt(answer.options.charAt(0));
     // Field names for products and departments tables
-    let prodFields = [ ['ID', 'Product', 'Price', 'Quantity'] ];
+    let prodFields = [ ['ID', 'Product', 'Price', 'Department', 'Quantity'] ];
     let departFields = [ ['ID', 'Department'] ];
     switch (option) {
       case 1:
