@@ -8,7 +8,7 @@ const messages = {
   lowItem: 'Which item would you like to restock? Enter product ID.',
   lowAmount: 'Add how many items to current stock?',
   addItem: 'What is the name of the item you would like to add?',
-  addDept: 'In which department does the item belong?',
+  addDept: 'In which department does the item belong? Enter ID from table above.',
   addPrice: 'What is the retail price of that item?',
   addCost: 'What is the cost of that item?',
   addAmount: 'Set initial stock to how many items?'
@@ -21,7 +21,7 @@ const query = {
   lowInventory: "SELECT prod_id AS Id, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price, quantity AS Quantity FROM products WHERE quantity <= 5 ORDER BY quantity ASC, price ASC",
   // Query to add inventory to a selected item
   addInventory: "UPDATE products SET quantity = quantity + ? WHERE prod_id = ?",
-  viewDepartments: "SELECT * FROM departments",
+  viewDepartments: "SELECT dept_id AS Id, dept_name AS Department FROM departments",
   addProduct: "INSERT INTO products (prod_name, dept_id, price, cost, quantity) VALUES (?, ?, ?, ?, ?);"
 };
 
@@ -70,8 +70,9 @@ let prompts = function () {
         });
         break;
       case 4:
-        tableDisplay();
-        addProduct(prompts);
+        tableDisplay(query.viewDepartments, departFields, function () {
+          addProduct(query.addProduct);
+        });
         break;
       default:
         connection.end();
@@ -130,8 +131,7 @@ let addInventory = function (view) {
       name: 'quantity',
       message: messages.lowAmount,
       validate: function (value) {
-        value = parseInt(value);
-        if (Number.isInteger(value) && parseInt(value) > 0) {
+        if (parseInt(value) > 0) {
           return true;
         } else {
           return 'Please enter a positive, whole number.';
@@ -142,7 +142,7 @@ let addInventory = function (view) {
     inquirer.prompt({
       type: 'confirm',
       name: 'validate',
-      message: 'Process the above request?',
+      message: 'Process the above information?',
       default: true
     }).then(function (answer) {
       if (answer.validate) {
@@ -155,16 +155,100 @@ let addInventory = function (view) {
           prompts();
         });
       } else {
-        console.log(chalk.bold.red('\nRequest has been cancelled.\n'));
+        console.log(chalk.bold.red('\nProcess has been cancelled.\n'));
         prompts();
       }
     });
   });
 };
 
-let addProduct = function () {
-
-
+let addProduct = function (view) {
+  inquirer.prompt([
+    {
+      type: 'input',
+      name: 'item',
+      message: messages.addItem,
+      validate: function (value) {
+        if (value.length > 0) {
+          return true;
+        } else {
+          return 'Please enter a product name.';
+        }
+      }
+    },
+    {
+      type: 'input',
+      name: 'department',
+      message: messages.addDept,
+      validate: function (value) {
+        value = parseInt(value);
+        if (ids.indexOf(value) !== -1) {
+          return true;
+        } else {
+          return 'Please enter a valid department ID.';
+        }
+      }
+    },
+    {
+      type: 'input',
+      name: 'price',
+      message: messages.addPrice,
+      validate: function (value) {
+        if (parseFloat(value) > 0) {
+          return true;
+        } else {
+          return 'Please enter a positive number for the price.';
+        }
+      }
+    },
+    {
+      type: 'input',
+      name: 'cost',
+      message: messages.addCost,
+      validate: function (value) {
+        if (parseFloat(value) > 0) {
+          return true;
+        } else {
+          return 'Please enter a positive number for the cost.';
+        }
+      }
+    },
+    {
+      type: 'input',
+      name: 'quantity',
+      message: messages.addAmount,
+      validate: function (value) {
+        if (parseInt(value) > 0) {
+          return true;
+        } else {
+          return 'Please enter a positive, whole number.';
+        }
+      }
+    }
+  ]).then(function (answers) {
+    inquirer.prompt({
+      type: 'confirm',
+      name: 'validate',
+      message: 'Process the above information?',
+      default: true
+    }).then(function (answer) {
+      if (answer.validate) {
+        let name = answers.item.trim();
+        let dept = parseInt(answers.department);
+        let price = parseFloat(answers.price);
+        let cost = parseFloat(answers.cost);
+        let amt = parseInt(answers.quantity);
+        connection.query(view, [name, dept, price, cost, amt], function (err, results) {
+          if (err) throw err;
+          console.log(chalk.bold.cyan('\nAddition successful.\n'));
+          prompts();
+        });
+      } else {
+        console.log(chalk.bold.red('\nProcess has been cancelled.\n'));
+        prompts();
+      }
+    });
+  });
 };
 
 prompts();

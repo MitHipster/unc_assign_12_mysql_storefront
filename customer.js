@@ -81,8 +81,7 @@ let prompts = function () {
       name: 'quantity',
       message: messages.howMany,
       validate: function (value) {
-        value = parseInt(value);
-        if (Number.isInteger(value) && parseInt(value) > 0) {
+        if (parseInt(value) > 0) {
           return true;
         } else {
           return 'Please enter a positive, whole number.';
