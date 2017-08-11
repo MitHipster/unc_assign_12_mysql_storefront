@@ -1,11 +1,11 @@
-prod_name,dept_id,price,cost,quantity
-iPad Pro,1,599.99,320,3
-iPhone 7 Plus,1,899.99,450.25,10
-Samsung Microwave,2,199.99,120.75,4
-Kitchen Aid Mixer,2,359.89,178.50,8
-AAA Batteries,3,11.99,4.80,12
-Keurig Coffee Maker,3,79.99,41.10,2
-Chromecast,4,35,20.25,4
-Fire TV,4,89.99,43.90,11
-Greenies Dental Chews,5,24.75,12,6
-Frontline Plus,5,34.19,19.90,7
+"prod_id","prod_name","dept_id","price","cost","quantity","sales","cogs"
+1,"iPad Pro",1,599.99,320.00,2,599.99,320.00
+2,"iPhone 7 Plus",1,899.99,450.25,8,1799.98,900.50
+3,"Samsung Microwave",2,199.99,120.75,4,0.00,0.00
+4,"Kitchen Aid Mixer",2,359.89,178.50,5,1079.67,535.50
+5,"AAA Batteries",3,11.99,4.80,6,71.94,28.80
+6,"Keurig Coffee Maker",3,79.99,41.10,2,0.00,0.00
+7,"Chromecast",4,35.00,20.25,3,105.00,60.75
+8,"Fire TV",4,89.99,43.90,8,359.96,175.60
+9,"Greenies Dental Chews",5,24.75,12.00,3,74.25,36.00
+10,"Frontline Plus",5,34.19,19.90,6,34.19,19.90

@@ -1,6 +1,6 @@
-dept_name,overhead
-Electronics,10500
-Appliances,2200
-Household,7800
-Entertainment,3100
-Pets,6400
+"dept_id","dept_name","overhead"
+1,"Electronics",550.00
+2,"Appliances",220.00
+3,"Household",480.00
+4,"Entertainment",310.00
+5,"Pets",140.00
