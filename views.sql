@@ -20,3 +20,5 @@ SELECT prod_id AS Id, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Pri
 UPDATE products SET quantity = quantity + 1 WHERE prod_id = 3;
 
 INSERT INTO products (prod_name, dept_id, price, cost, quantity) VALUES ("Samsung Galaxy S8", 1, 749.99, 385.25, 4);
+
+SELECT departments.dept_name AS Department, CONCAT('$', FORMAT(SUM(products.sales), 2)) AS Sales, CONCAT('$', FORMAT(SUM(products.cogs), 2)) AS COGS, CONCAT('$', FORMAT(departments.overhead, 2)) AS Overhead, CONCAT('$', FORMAT(SUM(products.sales) - SUM(products.cogs) - departments.overhead, 2)) AS Profit FROM products INNER JOIN departments ON products.dept_id = departments.dept_id GROUP BY departments.dept_name, departments.overhead ORDER BY SUM(products.sales) - SUM(products.cogs) - departments.overhead DESC;

@@ -16,12 +16,12 @@ const messages = {
 
 const query = {
   // Query to show all products
-  viewProducts: "SELECT prod_id AS Id, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price, quantity AS Quantity FROM products",
+  viewProducts: "SELECT prod_id AS ID, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price, quantity AS Quantity FROM products",
   // Query to show low inventory items
-  lowInventory: "SELECT prod_id AS Id, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price, quantity AS Quantity FROM products WHERE quantity <= 5 ORDER BY quantity ASC, price ASC",
+  lowInventory: "SELECT prod_id AS ID, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price, quantity AS Quantity FROM products WHERE quantity <= 5 ORDER BY quantity ASC, price ASC",
   // Query to add inventory to a selected item
   addInventory: "UPDATE products SET quantity = quantity + ? WHERE prod_id = ?",
-  viewDepartments: "SELECT dept_id AS Id, dept_name AS Department FROM departments",
+  viewDepartments: "SELECT dept_id AS ID, dept_name AS Department FROM departments",
   addProduct: "INSERT INTO products (prod_name, dept_id, price, cost, quantity) VALUES (?, ?, ?, ?, ?);"
 };
 
@@ -44,7 +44,7 @@ let prompts = function () {
   inquirer.prompt({
     type: 'list',
     name: 'options',
-    message: 'Enter menu item number.',
+    message: 'Select menu item or enter item number.',
     choices: [
       '1. View Products for Sale',
       '2. View Low Inventory',
@@ -172,7 +172,7 @@ let addProduct = function (view) {
         if (value.length > 0) {
           return true;
         } else {
-          return 'Please enter a product name.';
+          return 'Please enter product name.';
         }
       }
     },
