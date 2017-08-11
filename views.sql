@@ -18,3 +18,5 @@ SELECT prod_id AS Id, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Pri
 SELECT prod_id AS Id, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price, quantity AS Quantity FROM products WHERE quantity <= 5 ORDER BY quantity ASC, price ASC;
 
 UPDATE products SET quantity = quantity + 1 WHERE prod_id = 3;
+
+INSERT INTO products (prod_name, dept_id, price, cost, quantity) VALUES ("Samsung Galaxy S8", 1, 749.99, 385.25, 4);
