@@ -11,7 +11,7 @@ const messages = {
 
 const query = {
   // Query to show all products
-  showProducts: "SELECT prod_id AS Id, prod_name AS Product, CONCAT('$', FORMAT(price, 2)) AS Price FROM products",
+  showProducts: "SELECT products.prod_id AS ID, products.prod_name AS Product, departments.dept_name AS Department,CONCAT('$', FORMAT(products.price, 2)) AS Price FROM products INNER JOIN departments ON products.dept_id = departments.dept_id ORDER BY departments.dept_id, products.prod_id",
   // Query to return inventory on item to be purchased
   checkQuantity: "SELECT quantity FROM products WHERE prod_id = ?",
   // Query to update products table for sale
@@ -19,12 +19,9 @@ const query = {
   // Query to get the total purchase price
   totalPurchase: "SELECT CONCAT('$', FORMAT(price * ?, 2)) AS total FROM products WHERE prod_id = ?"
 };
-// Field names for products table
-let products = [
-  ['ID', 'Product', 'Price']
-];
+
 // Store array of product IDs to validate user selection
-let prodIds = [];
+let ids = [];
 
 let connection = mysql.createConnection({
   host: 'localhost',
@@ -40,6 +37,10 @@ connection.connect(function (err) {
 });
 
 let showProducts = function () {
+  // Field names for products table
+  let products = [ ['ID', 'Product', 'Department', 'Price'] ];
+  // Store array of IDs to validate manager selection
+  ids = [];
   connection.query(query.showProducts, function (err, results) {
     if (err) throw err;
     // Loop through elements in the array
@@ -49,7 +50,7 @@ let showProducts = function () {
       // Loop through each key in the element
       for (let key in result) {
         // Populate product IDs array for validating product ID selection
-        if (key === 'Id') prodIds.push(result[key]);
+        if (key === 'ID') ids.push(result[key]);
         // Start pushing at index 1 as index 0 contains field names
         // Push key's value into empty array
         products[i + 1].push(result[key]);
@@ -69,7 +70,7 @@ let prompts = function () {
       message: messages.buyWhat,
       validate: function (value) {
         value = parseInt(value);
-        if (prodIds.indexOf(value) !== -1) {
+        if (ids.indexOf(value) !== -1) {
           return true;
         } else {
           return 'Please enter a valid product ID.';

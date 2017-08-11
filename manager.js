@@ -102,7 +102,7 @@ let tableData = function (data, results) {
     // Loop through each key in the element
     for (let key in result) {
       // Populate product IDs array for validating product ID selection
-      if (key === 'Id') ids.push(result[key]);
+      if (key === 'ID') ids.push(result[key]);
       // Start pushing at index 1 as index 0 contains field names
       // Push key's value into empty array
       data[i + 1].push(result[key]);
