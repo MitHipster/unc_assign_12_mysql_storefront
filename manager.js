@@ -4,6 +4,7 @@ const mysql = require('mysql');
 const table = require('table').table;
 const chalk = require('chalk');
 const border = require('./border.js');
+// inquirer prompt messages
 const messages = {
   lowItem: 'Which item would you like to restock? Enter product ID.',
   lowAmount: 'Add how many items to current stock?',
@@ -21,13 +22,16 @@ const query = {
   lowInventory: "SELECT products.prod_id AS ID, products.prod_name AS Product, departments.dept_name AS Department, CONCAT('$', FORMAT(products.price, 2)) AS Price, products.quantity AS Quantity FROM products INNER JOIN departments ON products.dept_id = departments.dept_id WHERE quantity <= 5 ORDER BY quantity ASC, price ASC;",
   // Query to add inventory to a selected item
   addInventory: "UPDATE products SET quantity = quantity + ? WHERE prod_id = ?",
+  // Query to show available departments
   viewDepartments: "SELECT dept_id AS ID, dept_name AS Department FROM departments",
+  // Query to add a new product
   addProduct: "INSERT INTO products (prod_name, dept_id, price, cost, quantity) VALUES (?, ?, ?, ?, ?);"
 };
 
-// Store array of IDs to validate manager selection
+// Store array of IDs to validate user selection
 let ids = [];
 
+// Define connection parameters form MySQL server
 let connection = mysql.createConnection({
   host: 'localhost',
   port: 3306,
@@ -36,10 +40,12 @@ let connection = mysql.createConnection({
   database: 'storeDB'
 });
 
+// Establish connection to MySQL server
 connection.connect(function (err) {
   if (err) throw err;
 });
 
+// Function to display menu options and return selection
 let prompts = function () {
   inquirer.prompt({
     type: 'list',
@@ -58,6 +64,7 @@ let prompts = function () {
     let prodFields = [ ['ID', 'Product', 'Department', 'Price', 'Quantity'] ];
     let departFields = [ ['ID', 'Department'] ];
     switch (option) {
+      // Call functions based on user selection by passing query, field names in array, and callback function
       case 1:
         tableDisplay(query.viewProducts, prodFields, prompts);
         break;
@@ -81,17 +88,20 @@ let prompts = function () {
   });
 };
 
+// Function for displaying table data
 let tableDisplay = function (view, fields, callback) {
   connection.query(view, function (err, results) {
     if (err) throw err;
     // Call tableData to create table array
     let records = tableData(fields, results);
+    // Use table node to create a formatted table
     let output = table(records, border.config);
     console.log(output);
     if (callback) callback();
   });
 };
 
+// Function for compiling table data
 let tableData = function (data, results) {
   // Store array of IDs to validate manager selection
   ids = [];
@@ -101,22 +111,24 @@ let tableData = function (data, results) {
     data.push([]);
     // Loop through each key in the element
     for (let key in result) {
-      // Populate product IDs array for validating product ID selection
+      // Populate IDs array for validating ID selection
       if (key === 'ID') ids.push(result[key]);
       // Start pushing at index 1 as index 0 contains field names
-      // Push key's value into empty array
+      // Push key values into empty array
       data[i + 1].push(result[key]);
     }
   });
   return data;
 };
 
+// Function to display prompts for adding inventory
 let addInventory = function (view) {
   inquirer.prompt([
     {
       type: 'input',
       name: 'item',
       message: messages.lowItem,
+      // Validate entered product Id
       validate: function (value) {
         value = parseInt(value);
         if (ids.indexOf(value) !== -1) {
@@ -130,6 +142,7 @@ let addInventory = function (view) {
       type: 'input',
       name: 'quantity',
       message: messages.lowAmount,
+      // Validate inventory amount
       validate: function (value) {
         if (parseInt(value) > 0) {
           return true;
@@ -139,22 +152,26 @@ let addInventory = function (view) {
       }
     }
   ]).then(function (answers) {
+    // Confirm answers before processing
     inquirer.prompt({
       type: 'confirm',
       name: 'validate',
       message: 'Process the above information?',
       default: true
     }).then(function (answer) {
+      // If 'yes', process request
       if (answer.validate) {
         // Convert validated inouts to integers
         let item = parseInt(answers.item);
         let amt = parseInt(answers.quantity);
+        // Pass query with quantity and product Id as parameter
         connection.query(view, [amt, item], function (err, results) {
           if (err) throw err;
           console.log(chalk.bold.cyan('\nUpdate successful.\n'));
           prompts();
         });
       } else {
+        // If 'no', cancel request
         console.log(chalk.bold.red('\nProcess has been cancelled.\n'));
         prompts();
       }
@@ -162,12 +179,14 @@ let addInventory = function (view) {
   });
 };
 
+// Function to add a new product
 let addProduct = function (view) {
   inquirer.prompt([
     {
       type: 'input',
       name: 'item',
       message: messages.addItem,
+      // Validate that a product name was entered
       validate: function (value) {
         if (value.length > 0) {
           return true;
@@ -180,6 +199,7 @@ let addProduct = function (view) {
       type: 'input',
       name: 'department',
       message: messages.addDept,
+      // Validate department ID
       validate: function (value) {
         value = parseInt(value);
         if (ids.indexOf(value) !== -1) {
@@ -193,6 +213,7 @@ let addProduct = function (view) {
       type: 'input',
       name: 'price',
       message: messages.addPrice,
+      // Validate retail price
       validate: function (value) {
         if (parseFloat(value) > 0) {
           return true;
@@ -205,6 +226,7 @@ let addProduct = function (view) {
       type: 'input',
       name: 'cost',
       message: messages.addCost,
+      // Validate wholesale cost
       validate: function (value) {
         if (parseFloat(value) > 0) {
           return true;
@@ -217,6 +239,7 @@ let addProduct = function (view) {
       type: 'input',
       name: 'quantity',
       message: messages.addAmount,
+      // Validate inventory amount
       validate: function (value) {
         if (parseInt(value) > 0) {
           return true;
@@ -226,24 +249,28 @@ let addProduct = function (view) {
       }
     }
   ]).then(function (answers) {
+    // Confirm answers before processing
     inquirer.prompt({
       type: 'confirm',
       name: 'validate',
       message: 'Process the above information?',
       default: true
     }).then(function (answer) {
+      // If 'yes', process request
       if (answer.validate) {
         let name = answers.item.trim();
         let dept = parseInt(answers.department);
         let price = parseFloat(answers.price);
         let cost = parseFloat(answers.cost);
         let amt = parseInt(answers.quantity);
+        // Pass query with product name, department ID, retail price, wholesale cost, and quantity as parameters
         connection.query(view, [name, dept, price, cost, amt], function (err, results) {
           if (err) throw err;
           console.log(chalk.bold.cyan('\nAddition successful.\n'));
           prompts();
         });
       } else {
+        // If 'no', cancel request
         console.log(chalk.bold.red('\nProcess has been cancelled.\n'));
         prompts();
       }
