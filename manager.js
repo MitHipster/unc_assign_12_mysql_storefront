@@ -55,7 +55,7 @@ let prompts = function () {
   }).then(function (answer) {
     let option = parseInt(answer.options.charAt(0));
     // Field names for products and departments tables
-    let prodFields = [ ['ID', 'Product', 'Price', 'Department', 'Quantity'] ];
+    let prodFields = [ ['ID', 'Product', 'Department', 'Price', 'Quantity'] ];
     let departFields = [ ['ID', 'Department'] ];
     switch (option) {
       case 1:
